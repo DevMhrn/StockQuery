@@ -55,12 +55,16 @@ function QueryResult({ query }) {
     const conditions = query.split('AND').map((cond) => cond.trim());
     return data.filter((item) => {
       return conditions.every((cond) => {
-        const match = cond.match(/(.*?)\s*([><=]+)\s*(.*)/);
+        // Clean up extra spaces before and after the condition
+        const cleanedCond = cond.trim();
+        
+        // Match the pattern: field operator value
+        const match = cleanedCond.match(/(.*?)\s*([><=]+)\s*(.*)/);
         if (!match) return false;
   
-        const field = match[1].trim();
-        const operator = match[2].trim();
-        const value = parseFloat(match[3].trim());
+        const field = match[1].trim();  // Trim the field name
+        const operator = match[2].trim();  // Trim the operator
+        const value = parseFloat(match[3].trim());  // Trim and parse the value
         const itemValue = parseFloat(item[field]);
   
         if (isNaN(itemValue) || isNaN(value)) return false;
@@ -82,6 +86,7 @@ function QueryResult({ query }) {
       });
     });
   };
+  
 
   useEffect(() => {
     const filtered = applyQuery(stockData, cleanQuery);
@@ -140,14 +145,15 @@ function QueryResult({ query }) {
       </div>
       <div className="result-summary">
         <p>Total Stocks: {sortedData.length}</p>
-        {sortedData.length > 0 && (
-          <div className="result-options">
-            <button className="option-button">Industry</button>
-            <button className="option-button">Export</button>
-            <button className="option-button">Edit Columns</button>
-          </div>
-        )}
-      </div>
+            {sortedData.length > 0 && (
+                <div className="result-options">
+                <button className="option-button">Industry</button>
+                <button className="option-button">Export</button>
+                <button className="option-button">Edit Columns</button>
+                </div>
+            )}
+        </div>
+
 
       {sortedData.length > 0 ? (
         <>
