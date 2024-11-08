@@ -254,3 +254,31 @@
 .export-button {
     background-color: #28a745; /* Change color for export button */
 }
+/* Add this in your QueryResult.css file */
+.table-header th {
+    position: relative;
+  }
+  
+  .table-header th:hover::after {
+    content: attr(title); 
+    position: absolute;
+    background-color: #333;
+    color: #fff;
+    padding: 5px 8px;
+    border-radius: 3px;
+    top: 100%; 
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.9s ease, transform 0.9s ease; 
+    z-index: 10;
+  }
+  
+  .table-header th:hover::after {
+    opacity: 1;
+    transform: translate(-50%, -10px); /* Slight upward movement for effect */
+    transition-delay: 1s; /* Delay before showing tooltip */
+  }
+  

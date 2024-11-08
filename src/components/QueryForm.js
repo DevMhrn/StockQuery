@@ -31,9 +31,9 @@ function QueryForm({ onRunQuery, query }) {
           <div className="query-example-box">
             <p className="query-example">
               Custom query example<br /><br />
-              Market capitalization {'>'} 500 AND<br />
-              Price to earning {'<'} 15 AND<br />
-              Return on capital employed {'>'} 22%<br /><br />
+              Market Capitalization {'>'} 100 AND<br />
+              P/E Ratio{'<'} 15 AND<br />
+              ROE{'>'} 22%<br /><br />
             </p>
             <p className="query-guide">Detailed guide on creating screens</p>
           </div>
