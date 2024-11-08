@@ -138,11 +138,7 @@ function QueryResult({ query }) {
   const handleCloseModal = () => setIsModalOpen(false);
   const handleSaveModal = () => setIsModalOpen(false);
 
-  const handleDeleteScreen = () => {
-    const updatedScreens = savedScreens.filter(screen => screen.link !== currentPath);
-    localStorage.setItem('savedScreens', JSON.stringify(updatedScreens));
-    setSavedScreens(updatedScreens);
-  };
+  
 
   return (
     <div className="query-result-container">
@@ -152,9 +148,6 @@ function QueryResult({ query }) {
           <button className="option-button" onClick={toggleEditMode} style={{ marginRight: '10px' }}>
             {isEditMode ? 'Exit Edit Mode' : 'Edit Columns'}
           </button>
-          {savedScreens.some(screen => screen.link === currentPath) && (
-            <button className="delete-button" onClick={handleDeleteScreen}>Delete Screen</button>
-          )}
           <button className="save-button" onClick={handleSaveScreen}>Save Screen</button>
         </div>
       </div>
@@ -252,7 +245,10 @@ function QueryResult({ query }) {
 
 
 
-      <SaveScreenPopup isOpen={isModalOpen} onClose={handleCloseModal} onSave={handleSaveModal} />
+      <SaveScreenPopup isOpen={isModalOpen}
+        data={sortedData}  // Pass the sorted data to SaveScreenPopup
+        onClose={handleCloseModal}
+        onSave={handleSaveModal}  />
     </div>
   );
 }
