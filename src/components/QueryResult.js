@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { FaArrowDown, FaArrowUp, FaArrowLeft, FaArrowRight } from 'react-icons/fa';
+import { FaArrowDown, FaArrowUp, FaArrowLeft, FaArrowRight, FaTimes } from 'react-icons/fa';
 import * as XLSX from 'xlsx';
-import SaveScreenPopup from '../components/SaveScreenPopup';
+import SaveScreenPopup from './SaveScreenPopup';
 import '../styles/QueryResult.css';
 
 function QueryResult({ query }) {
@@ -20,6 +20,9 @@ function QueryResult({ query }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [savedScreens, setSavedScreens] = useState([]);
   const [currentPath, setCurrentPath] = useState('');
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [visibleColumns, setVisibleColumns] = useState([]);
+  const [removedColumns, setRemovedColumns] = useState([]);
 
   const columnDisplayNames = {
     'Current Ratio': 'Curr. Ratio',
@@ -47,6 +50,7 @@ function QueryResult({ query }) {
         const jsonData = XLSX.utils.sheet_to_json(worksheet);
         console.log('Excel file loaded successfully:', jsonData);
         setStockData(jsonData);
+        setVisibleColumns(Object.keys(jsonData[0] || {}));
       })
       .catch((error) => console.error('Error loading the Excel file:', error));
   }, [query]);
@@ -55,20 +59,17 @@ function QueryResult({ query }) {
     const conditions = query.split('AND').map((cond) => cond.trim());
     return data.filter((item) => {
       return conditions.every((cond) => {
-        // Clean up extra spaces before and after the condition
         const cleanedCond = cond.trim();
-        
-        // Match the pattern: field operator value
         const match = cleanedCond.match(/(.*?)\s*([><=]+)\s*(.*)/);
         if (!match) return false;
-  
-        const field = match[1].trim();  // Trim the field name
-        const operator = match[2].trim();  // Trim the operator
-        const value = parseFloat(match[3].trim());  // Trim and parse the value
+
+        const field = match[1].trim();
+        const operator = match[2].trim();
+        const value = parseFloat(match[3].trim());
         const itemValue = parseFloat(item[field]);
-  
+
         if (isNaN(itemValue) || isNaN(value)) return false;
-  
+
         switch (operator) {
           case '>':
             return itemValue > value;
@@ -86,7 +87,6 @@ function QueryResult({ query }) {
       });
     });
   };
-  
 
   useEffect(() => {
     const filtered = applyQuery(stockData, cleanQuery);
@@ -122,6 +122,18 @@ function QueryResult({ query }) {
   const currentStocks = sortedData.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(sortedData.length / itemsPerPage);
 
+  const toggleEditMode = () => setIsEditMode(!isEditMode);
+
+  const handleColumnRemove = (column) => {
+    setRemovedColumns([...removedColumns, column]);
+    setVisibleColumns(visibleColumns.filter((col) => col !== column));
+  };
+
+  const handleColumnAdd = (column) => {
+    setRemovedColumns(removedColumns.filter((col) => col !== column));
+    setVisibleColumns([...visibleColumns, column]);
+  };
+
   const handleSaveScreen = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
   const handleSaveModal = () => setIsModalOpen(false);
@@ -137,83 +149,110 @@ function QueryResult({ query }) {
       <div className="query-result-header">
         <h2 className="query-title">Query Results</h2>
         <div className="query-actions">
+          <button className="option-button" onClick={toggleEditMode} style={{ marginRight: '10px' }}>
+            {isEditMode ? 'Exit Edit Mode' : 'Edit Columns'}
+          </button>
           {savedScreens.some(screen => screen.link === currentPath) && (
             <button className="delete-button" onClick={handleDeleteScreen}>Delete Screen</button>
           )}
           <button className="save-button" onClick={handleSaveScreen}>Save Screen</button>
         </div>
       </div>
-      <div className="result-summary">
-        <p>Total Stocks: {sortedData.length}</p>
+
+      {isEditMode ? (
+        <div className="edit-columns-bar">
+          {visibleColumns.map((col) => (
+            <span key={col} className="column-node">
+              {columnDisplayNames[col] || col}
+              <FaTimes className="remove-icon" onClick={() => handleColumnRemove(col)} />
+            </span>
+          ))}
+          {removedColumns.map((col) => (
+            <span key={col} className="column-node removed" onClick={() => handleColumnAdd(col)}>
+              {columnDisplayNames[col] || col}
+            </span>
+          ))}
+        </div>
+      ) : (
+        <>
+          <div className="result-summary">
+            <p>Total Stocks: {sortedData.length}</p>
             {sortedData.length > 0 && (
-                <div className="result-options">
+              <div className="result-options">
                 <button className="option-button">Industry</button>
                 <button className="option-button">Export</button>
-                <button className="option-button">Edit Columns</button>
-                </div>
+                
+              </div>
             )}
-        </div>
+          </div>
 
-
-      {sortedData.length > 0 ? (
-        <>
-          <div className="query-table-container">
-            <table className="query-table">
-              <thead>
-                <tr className="table-header">
-                  <th>S.No.</th>
-                  {Object.keys(filteredData[0]).map((key) => (
-                    <th key={key} onClick={() => handleSort(key)} title={key}>
-                      {columnDisplayNames[key] || key}
-                      {sortConfig.key === key &&
-                        (sortConfig.direction === 'ascending' ? <FaArrowUp /> : <FaArrowDown />)}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {currentStocks.map((stock, index) => (
-                  <tr key={index} className="table-row">
-                    <td>{indexOfFirstItem + index + 1}</td>
-                    {Object.values(stock).map((value, idx) => (
-                      <td key={idx}>{value}</td>
+          {sortedData.length > 0 ? (
+            <div className="query-table-container">
+              <table className="query-table">
+                <thead>
+                  <tr className="table-header">
+                    <th>S.No.</th>
+                    {visibleColumns.map((key) => (
+                      <th key={key} onClick={() => handleSort(key)} title={key}>
+                        {columnDisplayNames[key] || key}
+                        {sortConfig.key === key &&
+                          (sortConfig.direction === 'ascending' ? <FaArrowUp /> : <FaArrowDown />)}
+                      </th>
                     ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          <div className="pagination">
-            <div className="pagination-controls">
-              <button onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1}>
-                <FaArrowLeft /> Previous
-              </button>
-              <span className="page-info">Page {currentPage} of {totalPages}</span>
-              <button onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages}>
-                Next <FaArrowRight />
-              </button>
+                </thead>
+                <tbody>
+                  {currentStocks.map((stock, index) => (
+                    <tr key={index} className="table-row">
+                      <td>{indexOfFirstItem + index + 1}</td>
+                      {visibleColumns.map((col, idx) => (
+                        <td key={idx}>{stock[col]}</td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-            
-            <div className="rows-per-page">
-              <label>Rows per page:</label>
-              {[10, 25, 50].map((num) => (
-                <button 
-                  key={num} 
-                  onClick={() => handleRowsPerPageChange(num)} 
-                  className={`page-button ${itemsPerPage === num ? 'active' : ''}`}
-                >
-                  {num}
-                </button>
-              ))}
-            </div>
-          </div>
+          ) : (
+            <p>Total stocks are zero.</p>
+          )}
         </>
-      ) : (
-        <p>Total stocks are zero.</p>
       )}
 
-      {isModalOpen && <SaveScreenPopup onCancel={handleCloseModal} onSave={handleSaveModal} />}
+        {sortedData.length > 0 && (
+        <div className="pagination">
+            <div className="pagination-controls">
+            <button onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1}>
+                <FaArrowLeft /> Previous
+            </button>
+            <span className="page-info">
+                Page {currentPage} of {totalPages}
+            </span>
+            <button onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages}>
+                Next <FaArrowRight />
+            </button>
+            </div>
+
+            <div className="rows-per-page">
+            <span>Rows per page:</span>
+            <div className="rows-buttons">
+                {['10', '25', '50', '100'].map((value) => (
+                <button
+                    key={value}
+                    className={`page-button ${itemsPerPage === Number(value) ? 'active' : ''}`}
+                    onClick={() => handleRowsPerPageChange(Number(value))}
+                >
+                    {value}
+                </button>
+                ))}
+            </div>
+            </div>
+        </div>
+        )}
+
+
+
+      <SaveScreenPopup isOpen={isModalOpen} onClose={handleCloseModal} onSave={handleSaveModal} />
     </div>
   );
 }

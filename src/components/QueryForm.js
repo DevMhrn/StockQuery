@@ -1,14 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/QueryForm.css';
 
-function QueryForm({ onRunQuery }) {
-  const [query, setQuery] = useState('');
+function QueryForm({ onRunQuery, query }) {
+  const [localQuery, setLocalQuery] = useState(query);
   const [onlySepResults, setOnlySepResults] = useState(false);
 
+  // Update localQuery whenever the query prop changes
+  useEffect(() => {
+    setLocalQuery(query);
+  }, [query]);
+
   const handleRunQueryClick = () => {
-    const processedQuery = query.trim();
+    const processedQuery = localQuery.trim();
     onRunQuery(processedQuery);
-    // No need to clear the query, so it remains in the text area
   };
 
   return (
@@ -21,8 +25,8 @@ function QueryForm({ onRunQuery }) {
             placeholder="Enter your search query..."
             className="query-textarea"
             rows="6"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            value={localQuery}
+            onChange={(e) => setLocalQuery(e.target.value)}
           />
           <div className="query-example-box">
             <p className="query-example">

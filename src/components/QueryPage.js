@@ -17,10 +17,10 @@ function QueryPage() {
       {showResults ? (
         <>
           <QueryResult query={query} />
-          <QueryForm onRunQuery={handleRunQuery} showResults={false} />
+          <QueryForm onRunQuery={handleRunQuery} query={query} showResults={false} />
         </>
       ) : (
-        <QueryForm onRunQuery={handleRunQuery} showResults={showResults} />
+        <QueryForm onRunQuery={handleRunQuery} query={query} showResults={showResults} />
       )}
     </div>
   );
