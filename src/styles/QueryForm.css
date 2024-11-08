@@ -1,0 +1,134 @@
+.query-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    width: 90%;
+    max-width: 90vh;
+    background-color: #ebeff6;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+.query-box {
+    background-color: #ffffff;
+    padding: 1.25rem;
+    border-radius: 1rem;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    text-align: center;
+}
+
+.query-title-box {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: -1rem;
+    display: flex;
+    justify-content: flex-start;
+    margin-left: 1rem;
+}
+
+.query-subtitle {
+    font-size: 1.1rem;
+    color: #555;
+    display: flex;
+    justify-content: flex-start;
+    margin-left: 1rem;
+    margin-bottom: 2rem;
+}
+
+.query-input-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+    gap: 1.25rem;
+    width: 100%;
+}
+
+.query-textarea {
+    width: 60%;
+    height: 14em;
+    padding: 0.5rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.2s ease-in-out;
+}
+
+.query-textarea:focus {
+    border-color: #6366f1;
+}
+
+.query-example-box {
+    width: 35%;
+    background-color: #f7faff;
+    border: 1px solid #3483ea;
+    border-radius: 8px;
+    padding: 15px;
+    color: #0f0e0e;
+    text-align: left;
+    font-size: 12px;
+    height: 14em;
+}
+
+.query-example-box .query-example {
+    color: #555;
+    font-size: 14px;
+}
+
+.query-guide {
+    color: #6366f1;
+    font-size: 16px;
+    margin-top: 10px;
+    text-decoration: none;
+}
+
+/* Checkbox for Sep 2024 filter */
+.query-filter {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 1rem;
+    margin-left: 1rem;
+    color: #333;
+    font-size: 1rem;
+}
+
+.query-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2rem;
+}
+
+.query-button {
+    background-color: #6366f1;
+    color: white;
+    font-weight: 600;
+    padding: 0.8rem;
+    border-radius: 0.3rem;
+    font-size: 0.9rem;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+    width: 28%;
+}
+
+.query-button:hover {
+    background-color: #4f4bd1;
+}
+
+.show-all-ratios-button {
+    background-color: #6366f1;
+    color: white;
+    font-weight: 600;
+    padding: 0.8rem;
+    border-radius: 0.3rem;
+    font-size: 0.9rem;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+    width: 28%;
+}
+
+
